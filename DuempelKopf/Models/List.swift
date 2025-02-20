@@ -29,7 +29,7 @@ class List: Identifiable{
         self.players = []
         self.block = [
             "Punkte" : [],
-            "Böcke" :[mitBockStarten ? 1 : 0]
+            "Böcke" :[mitBockStarten ? 1 : 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         ]
         self.nurMinus = nurMinus
         self.maxDoppelBock = maxDoppelBock
@@ -48,6 +48,7 @@ class List: Identifiable{
         name: "TestListe",
         players: Player.allNames,
         info: "Die erste Testliste",
+        mitBockStarten: true,
         einsatz: 0.2
         
     )

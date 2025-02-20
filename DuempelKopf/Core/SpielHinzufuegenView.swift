@@ -52,8 +52,8 @@ struct SpielHinzufuegenView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                Line()
+            ScrollView {
+                
                 VStack {
                     ForEach(Array(teams.keys).chunked(into: 3), id: \.self) { row in
                         HStack {

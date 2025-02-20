@@ -53,7 +53,7 @@ extension SingleListViewModel{
                     punkteRe += 1
                     gewinner = .re
                 }else{
-                    punkteKontra += 1
+                    punkteKontra += 2
                     gewinner = .kontra
                 }
             case "keine 60":
@@ -61,9 +61,9 @@ extension SingleListViewModel{
                     punkteRe += 2
                     gewinner = .re
                 }else{
-                    punkteKontra += 1
+                    punkteKontra += 2
                     if spiel.kontraAugen >= 90{
-                        punkteKontra += 1
+                        punkteKontra += 2
                         
                     }
                     gewinner = .kontra
@@ -73,12 +73,12 @@ extension SingleListViewModel{
                     punkteRe += 3
                     gewinner = .re
                 }else{
-                    punkteKontra += 1
+                    punkteKontra += 2
                     if spiel.kontraAugen >= 60{
-                        punkteKontra += 1
+                        punkteKontra += 2
                     }
                     if spiel.kontraAugen >= 90{
-                        punkteKontra += 1
+                        punkteKontra += 2
                     }
                     gewinner = .kontra
                 }
@@ -87,16 +87,16 @@ extension SingleListViewModel{
                     punkteRe += 4
                     gewinner = .re
                 }else{
-                    punkteKontra += 1
+                    punkteKontra += 2
                     
                     if spiel.kontraAugen >= 30{
-                        punkteKontra += 1
+                        punkteKontra += 2
                     }
                     if spiel.kontraAugen >= 60{
-                        punkteKontra += 1
+                        punkteKontra += 2
                     }
                     if spiel.kontraAugen >= 90{
-                        punkteKontra += 1
+                        punkteKontra += 2
                     }
                     gewinner = .kontra
                 }
@@ -105,6 +105,10 @@ extension SingleListViewModel{
                 gewinner = .notPlaying
             }
             
+        }else{
+            if spiel.reAugen > 120 {
+                gewinner = .re
+            }
         }
         
         
@@ -119,67 +123,71 @@ extension SingleListViewModel{
                     //punkteKontra += 1
                     gewinner = .kontra
                 }
-
+                
             case "keine 90":
                 if spiel.reAugen < 90 {
                     punkteKontra += 1
                     gewinner = .kontra
                 } else {
-                    punkteRe += 1
+                    punkteRe += 2
                     gewinner = .re
                 }
-
+                
             case "keine 60":
                 if spiel.reAugen < 60 {
                     punkteKontra += 2
                     gewinner = .kontra
                 } else {
-                    punkteRe += 1
+                    punkteRe += 2
                     if spiel.reAugen >= 90 {
-                        punkteRe += 1
+                        punkteRe += 2
                     }
                     gewinner = .re
                 }
-
+                
             case "keine 30":
                 if spiel.reAugen < 30 {
                     punkteKontra += 3
                     gewinner = .kontra
                 } else {
-                    punkteRe += 1
+                    punkteRe += 2
                     if spiel.reAugen >= 60 {
-                        punkteRe += 1
+                        punkteRe += 2
                     }
                     if spiel.reAugen >= 90 {
-                        punkteRe += 1
+                        punkteRe += 2
                     }
                     gewinner = .re
                 }
-
+                
             case "Schwarz":
                 if spiel.reAugen == 0 {
                     punkteKontra += 4
                     gewinner = .kontra
                 } else {
-                    punkteRe += 1
-
+                    punkteRe += 2
+                    
                     if spiel.reAugen >= 30 {
-                        punkteRe += 1
+                        punkteRe += 2
                     }
                     if spiel.reAugen >= 60 {
-                        punkteRe += 1
+                        punkteRe += 2
                     }
                     if spiel.reAugen >= 90 {
-                        punkteRe += 1
+                        punkteRe += 2
                     }
                     gewinner = .re
                 }
-
+                
             default:
                 gewinner = .notPlaying
             }
+        }else {
+            if spiel.kontraAugen >= 120 {
+                gewinner = .kontra
+            }
         }
-
+        
         
         
         
@@ -232,36 +240,118 @@ extension SingleListViewModel{
         var punkte = gewinner == .re ? punkteRe : punkteKontra
         
         //BÖCKE X
-        if let bockList = list.block["Böcken"],
-           let punkteList = list.block["Punkten"],
-           punkteList.count < bockList.count {
-
+        if let bockList = list.block["Böcke"],
+           let punkteList = list.block["Punkte"]
+           {
+            
             let bock = bockList[punkteList.count] // Sicherer Zugriff auf den Bock-Wert
-
+            
             punkte *= Int(pow(2.0, Double(bock))) // pow() gibt Double zurück → Umwandlung in Int
+            print("punkte x2")
+        }else{
+            print("nicht geladen")
         }
-
+        
         
         // Punktvergabe für jedes Teammitglied
         for (key, partei) in spiel.teams {
+            // Hole den letzten Punktestand des Spielers oder setze ihn auf 0
+            let letzterPunktestand = list.block[key]?.last ?? 0
+
+            // Falls der Spieler noch keine Einträge hat, initialisiere die Liste
+            if list.block[key] == nil {
+                list.block[key] = []
+            }
+
             if partei == .re {
+                let reCount = spiel.teams.values.filter { $0 == .re }.count
                 if gewinner == .re {
-                    if !list.nurMinus{
-                        list.block[key]?.append(punkte+(list.block[key]?.last ?? 0))
-                    }else{
-                        list.block[key]?.append((list.block[key]?.last ?? 0))
-                    }
+                    // Gewinner bekommt Punkte
+                    list.block[key]?.append(!list.nurMinus ? letzterPunktestand + (punkte * reCount == 3 ? 3 : 1) : letzterPunktestand)
+                } else {
+                    // Verlierer bekommt entweder -punkte oder bleibt bei nurMinus unverändert
+                    var modifiziertePunkte = list.nurMinus ? punkte : -punkte
+                    modifiziertePunkte *= reCount == 1 ? 3 : 1
+                    list.block[key]?.append(letzterPunktestand + modifiziertePunkte)
                 }
-                list.block[key]?.append(punkteRe)
             } else if partei == .kontra {
-                list.block[key]?.append(punkteKontra)
+                if gewinner == .kontra {
+                    // Gewinner bekommt Punkte
+                    list.block[key]?.append(!list.nurMinus ? letzterPunktestand + punkte : letzterPunktestand)
+                } else {
+                    // Verlierer bekommt entweder -punkte oder bleibt bei nurMinus unverändert
+                    let modifiziertePunkte = list.nurMinus ? punkte : -punkte
+                    list.block[key]?.append(letzterPunktestand + modifiziertePunkte)
+                }
             } else {
-                list.block[key]?.append(0) // Falls Spieler keiner Partei zugeordnet ist
+                // Falls Spieler keiner Partei zugeordnet ist, bleibt sein Punktestand gleich
+                list.block[key]?.append(letzterPunktestand)
             }
         }
+
+        list.block["Punkte"]?.append(punkte)
+        
+        
+        
+        //Böcke
+         if(
+            (re && kontra) ||
+            (kontra && gewinner == .re) ||
+            (punkte == 0) ||
+            (spiel.kontraAugen == 120) ||
+            (spiel.reSonderpunkte.contains("Herzdurchlauf")) ||
+            (spiel.kontraSonderpunkte.contains("Herzdurchlauf"))
+                
+         ){
+             böcke()
+         }
+        
+        
         
         return true
     }
+    
+    
+    func böcke() {
+        let p = list.players.count
+        var runde = list.block["Punkte"]?.count ?? 0
+        var i = 0
+
+        
+
+        while i < p {
+            // Sicherstellen, dass "Böcke" mindestens bis "runde + i" gefüllt ist
+            
+
+            if list.block["Böcke"] == nil {
+                list.block["Böcke"] = []
+            }
+            
+            // Bock-Wert holen
+            if let b = list.block["Böcke"]?[runde + i] {
+                if list.maxDoppelBock {
+                    if b < 2 {
+                        list.block["Böcke"]?[runde + i] = b + 1
+                        print("BOCK")
+                        i += 1
+                    } else {
+                        runde += 1
+                    }
+                } else {
+                    // Falls maxDoppelBock deaktiviert ist, erhöhe einfach i
+                    list.block["Böcke"]?[runde + i] = b + 1
+                    i += 1
+                }
+            } else {
+                // Falls der Index nicht existiert, setze ihn auf 1
+                list.block["Böcke"]?[runde + i] = 1
+                print("!BOCK")
+                i += 1
+            }
+        }
+    }
+
+    
     
 }
 
