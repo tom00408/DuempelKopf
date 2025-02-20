@@ -22,7 +22,10 @@ struct SpielHinzufuegenView: View {
         
         return playingTeams.count == 4 &&
                (reCount == 1 || reCount == 2) &&
-               (kontraCount == 2 || kontraCount == 3)
+               (kontraCount == 2 || kontraCount == 3) &&
+                (reAugen != nil && kontraAugen != nil) &&
+                (0 <= reAugen ?? -1 && reAugen ?? 251 <=  240)
+        
     }
 
     

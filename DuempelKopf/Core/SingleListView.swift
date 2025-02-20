@@ -1,17 +1,9 @@
-//
-//  SingleListView.swift
-//  DuempelKopf
-//
-//  Created by Tom Tiedtke on 19.02.25.
-//
-
 import SwiftUI
+import SwiftData
 
 struct SingleListView: View {
     
-    @StateObject var viewModel =  SingleListViewModel()
-    
-    let list: List
+    @StateObject var viewModel: SingleListViewModel
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
@@ -19,31 +11,34 @@ struct SingleListView: View {
     @State private var showDeleteAlert = false
     @State private var showSpielHinzufügen = false
     
+    init(list: List) {
+        _viewModel = StateObject(wrappedValue: SingleListViewModel(list: list))
+    }
+    
     var body: some View {
         VStack {
             
-            Text(list.name)
+            Text(viewModel.list.name)
                 .font(.system(size: 48, weight: .bold, design: .serif))
-            
-            HStack{
-                if list.maxDoppelBock{
+             
+            HStack {
+                if viewModel.list.maxDoppelBock {
                     ListenFeatureView("Max DoppelBock")
                 }
-                if list.nurMinus{
+                if viewModel.list.nurMinus {
                     ListenFeatureView("Nur Minus")
                 }
             }
-            Text(list.info)
+            
+            Text(viewModel.list.info)
                 .font(.system(size: 24, weight: .light, design: .serif))
             
             /*
              SPIEL HINZUFÜGEN
              */
             Button {
-                // Aktion hier einfügen
                 showSpielHinzufügen.toggle()
-            }
-            label: {
+            } label: {
                 HStack {
                     Spacer()
                     Text("Spiel hinzufügen")
@@ -63,13 +58,10 @@ struct SingleListView: View {
             /*
              TABELLE / STANDINGS
              */
-            
-            
             Spacer()
-            // LISTE LÖSCHEN
             
+            // LISTE LÖSCHEN
             Button {
-                // Alert anzeigen
                 showDeleteAlert = true
             } label: {
                 HStack {
@@ -90,25 +82,15 @@ struct SingleListView: View {
             .alert("Liste löschen", isPresented: $showDeleteAlert) {
                 Button("Abbrechen", role: .cancel) {}
                 Button("Löschen", role: .destructive) {
-                    deleteList()
+                    viewModel.deleteList(context: context, dismiss: dismiss)
                 }
             } message: {
                 Text("Bist du sicher, dass du diese Liste löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")
             }
-        }.sheet(isPresented: $showSpielHinzufügen) {
-            SpielHinzufuegenView(list: list)
         }
-    }
-    
-    // Funktion zum Löschen der Liste
-    private func deleteList() {
-        context.delete(list)
-        do {
-            try context.save()
-        } catch {
-            print("Fehler beim Löschen der Liste: \(error)")
+        .sheet(isPresented: $showSpielHinzufügen) {
+            SpielHinzufuegenView(list: viewModel.list)
         }
-        dismiss()
     }
 }
 
