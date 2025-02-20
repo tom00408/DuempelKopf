@@ -5,6 +5,7 @@ struct SingleSelectDropdown: View {
     let title: String
     let options: [String]
     @Binding var selectedOption: String
+    let partei : Partei
     
     var body: some View {
         Menu {
@@ -28,12 +29,12 @@ struct SingleSelectDropdown: View {
                     .foregroundColor(.primary)
                 Spacer()*/
                 Text(selectedOption)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                     .lineLimit(1)
             }
             .padding()
             .frame(width: 150) // Breite der DropDowns
-            .background(Color(.systemGray6))
+            .background(partei == .re ? Color.Re : Color.Kontra)
             .cornerRadius(8)
         }
     }

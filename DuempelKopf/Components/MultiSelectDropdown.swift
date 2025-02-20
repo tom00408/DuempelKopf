@@ -5,7 +5,7 @@ struct MultiSelectDropdown: View {
     let title: String
     let options: [String]
     @Binding var selectedItems: [String]
-    
+    let color : Color
     var body: some View {
         Menu {
             ForEach(options, id: \.self) { option in
@@ -24,12 +24,12 @@ struct MultiSelectDropdown: View {
             HStack {
                 //Text("selectedItems.isEmpty ? "Auswählen..." : "\(selectedItems.count) gewählt"")
                 Text("Sonderpunkte")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white)
                     .lineLimit(1)
             }
             .padding()
             .frame(width: 150)
-            .background(Color(.systemGray6))
+            .background(color)
             .cornerRadius(8)
         }
     }

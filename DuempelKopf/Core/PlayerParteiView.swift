@@ -12,12 +12,12 @@ struct PlayerParteiView: View {
     var key: String
     @Binding var partei : Partei
     
-    private var img: String {
+    private var img: String? {
         switch partei {
         case .re:
             return "suit.club"
         case .notPlaying:
-            return "suit.clubs"
+            return nil
         case .kontra:
             return "suit.diamond"
         }
@@ -51,8 +51,9 @@ struct PlayerParteiView: View {
                 Text("\(key)")
                     .padding(.horizontal, 4)
                     .font(.system(size: 18, weight: .light, design: .serif))
-                
-                Image(systemName: img)
+                if let img{
+                    Image(systemName: img)
+                }
             }
             .padding()
             .background(color)

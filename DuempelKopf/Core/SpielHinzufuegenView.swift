@@ -10,6 +10,13 @@ import SwiftUI
 struct SpielHinzufuegenView: View {
     
     var list: List
+    @ObservedObject var viewModel : SingleListViewModel
+    
+    init(viewModel: SingleListViewModel){
+        
+        self.viewModel = viewModel
+        self.list = viewModel.list
+    }
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
@@ -97,14 +104,16 @@ struct SpielHinzufuegenView: View {
                     SingleSelectDropdown(
                         title: "",
                         options: reOptions,
-                        selectedOption: $selectedReOption
+                        selectedOption: $selectedReOption,
+                        partei: .re
                     )
                     Text("Ansagen")
                         .font(.system(size: 16,weight: .bold, design: .serif))
                     SingleSelectDropdown(
                         title: "",
                         options: kontraOptions,
-                        selectedOption: $selectedKontraOption
+                        selectedOption: $selectedKontraOption,
+                        partei: .re
                     )
                     Spacer()
                     
@@ -116,7 +125,9 @@ struct SpielHinzufuegenView: View {
                         title: "Re",
                         value: $reAugen,
                         linkedValue: $kontraAugen,
-                        total: 240
+                        total: 240,
+                        partei: .re
+                        
                     )
                     Text("  Augen  ")
                         .font(.system(size: 16,weight: .bold, design: .serif))
@@ -125,19 +136,24 @@ struct SpielHinzufuegenView: View {
                         title: "Kontra",
                         value: $kontraAugen,
                         linkedValue: $reAugen,
-                        total: 240
+                        total: 240,
+                        partei: .kontra
                     )
                     Spacer()
                 }
                 HStack(alignment: .top){
-                    MultiSelectionListView(selectedItems: $reSonderpunkte)
-                    MultiSelectionListView(selectedItems: $kontraSonderpunkte)
+                    MultiSelectionListView(selectedItems: $reSonderpunkte, partei: .re)
+                    MultiSelectionListView(
+                        selectedItems: $kontraSonderpunkte,
+                        partei: .kontra
+                    )
                 }
     
                 
                 
                 Spacer()
             }
+            .background(Color(.systemGray5))
             .navigationTitle("Spiel hinzufügen")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -148,9 +164,23 @@ struct SpielHinzufuegenView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Speichern") {
-                        print(teams)
-                        updateListe()
-                        dismiss()
+                        //print(teams)
+                        
+                        let spiel = Spiel(
+                            id: UUID().uuidString,
+                            teams: teams,
+                            reAugen: reAugen!,
+                            kontraAugen: kontraAugen!,
+                            selectedReOption: selectedReOption,
+                            selectedKontraOption: selectedKontraOption,
+                            reSonderpunkte: reSonderpunkte,
+                            kontraSonderpunkte: kontraSonderpunkte
+                        )
+                        
+                        
+                        if viewModel.addSpiel(spiel: spiel) {
+                            dismiss()
+                        }
                     }.disabled(!isSpielValid)
                 }
             }
@@ -188,21 +218,7 @@ struct SpielHinzufuegenView: View {
 }
 
 #Preview {
-    SpielHinzufuegenView(list: List.sample)
+    //SpielHinzufuegenView(list: List.sample)
 }
 
 
-// Enum für Partei
-enum Partei: String, Codable, CaseIterable, Identifiable {
-    case re, kontra, notPlaying
-    
-    var id: Self { self }
-    
-    var descr: String {
-        switch self {
-        case .re: "Re"
-        case .kontra: "Kontra"
-        case .notPlaying: "---"
-        }
-    }
-}

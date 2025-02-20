@@ -13,6 +13,21 @@ struct Line: View {
             .frame(width: 1000, height: 1)
     }
 }
+struct VLine: View {
+    
+    let h : CGFloat
+    let w : CGFloat
+    init(_ h : CGFloat, _ w: CGFloat = 1){
+        self.h = h
+        self.w = w
+    }
+    
+    var body: some View {
+        Rectangle()
+            .frame(width: w, height: h)
+    }
+}
+
 
 #Preview {
     Line()

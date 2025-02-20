@@ -12,6 +12,8 @@ struct NewListFormView: View {
     
     @State private var nurMinus = true
     @State private var maxDoppelBock = true
+    @State private var mitBockStarten = false
+    @State private var einsatz = ""
     
     
     @State private var OGs: [String] = ["Emil", "Erik", "Nils", "Tom", "Freddy"]
@@ -39,6 +41,14 @@ struct NewListFormView: View {
                         Text("maximal DoppelBock")
                     }
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
+                    
+                    Toggle(isOn: $mitBockStarten) {
+                        Text("mit Bock starten")
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
+                    
+                    TextField("Einsatz", text: $einsatz)
+                    
                 }
 
                 
@@ -151,11 +161,20 @@ struct NewListFormView: View {
             players: playerNames,
             info: info,
             nurMinus: nurMinus,
-            maxDoppelBock: maxDoppelBock
+            maxDoppelBock: maxDoppelBock,
+            mitBockStarten: mitBockStarten,
+            einsatz: parseToDouble(einsatz)
         )
+        //print(list.einsatz)
         
         context.insert(list)
     }
+    func parseToDouble(_ input: String) -> Double? {
+        let normalized = input.replacingOccurrences(of: ",", with: ".") // Komma durch Punkt ersetzen
+        return Double(normalized) // Versuchen, den String in Double zu konvertieren
+    }
+
+    
 }
 
 #Preview {

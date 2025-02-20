@@ -22,4 +22,7 @@ extension Color {
         
         self.init(red: r, green: g, blue: b)
     }
+    
+    static let Re = Color(hex: "#1A1A1D")
+    static let Kontra = Color(hex : "#D72638")
 }

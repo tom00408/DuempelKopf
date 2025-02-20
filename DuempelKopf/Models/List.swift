@@ -16,21 +16,28 @@ class List: Identifiable{
     var name : String
     var info : String
     var players : [Player]
-    
+    var block : [String : [Int]]
     var nurMinus : Bool
     var maxDoppelBock: Bool
+    var einsatz : Double?
     
-    init(name: String, players: [String], info: String, nurMinus: Bool = true, maxDoppelBock: Bool = true) {
+    init(name: String, players: [String], info: String, nurMinus: Bool = true, maxDoppelBock: Bool = true, mitBockStarten : Bool = false, einsatz: Double? = nil) {
         
         self.id = UUID().uuidString
         self.name = name
         self.info = info
         self.players = []
+        self.block = [
+            "Punkte" : [],
+            "Böcke" :[mitBockStarten ? 1 : 0]
+        ]
         self.nurMinus = nurMinus
         self.maxDoppelBock = maxDoppelBock
+        self.einsatz = einsatz
         
         for playerName in players{
             self.players.append(Player(playerName))
+            self.block[playerName] = []
         }
         
         
@@ -40,6 +47,9 @@ class List: Identifiable{
     static var sample = List(
         name: "TestListe",
         players: Player.allNames,
-        info: "Die erste Testliste"
+        info: "Die erste Testliste",
+        einsatz: 0.2
+        
     )
+    
 }
