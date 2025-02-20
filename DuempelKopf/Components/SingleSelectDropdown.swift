@@ -1,34 +1,38 @@
 import SwiftUI
 
-struct MultiSelectDropdown: View {
+struct SingleSelectDropdown: View {
     
     let title: String
     let options: [String]
-    @Binding var selectedItems: [String]
+    @Binding var selectedOption: String
     
     var body: some View {
         Menu {
             ForEach(options, id: \.self) { option in
                 Button(action: {
-                    selectedItems.append(option) // Mehrfachauswahl erlaubt
+                    selectedOption = option
                 }) {
                     HStack {
                         Text(option)
                         Spacer()
-                        Image(systemName: "plus.circle")
-                            .foregroundColor(.blue)
+                        if selectedOption == option {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
                     }
                 }
             }
         } label: {
             HStack {
-                //Text("selectedItems.isEmpty ? "Auswählen..." : "\(selectedItems.count) gewählt"")
-                Text("Sonderpunkte")
-                    .foregroundColor(.gray)
+                /*Text(title)
+                    .foregroundColor(.primary)
+                Spacer()*/
+                Text(selectedOption)
+                    .foregroundColor(.primary)
                     .lineLimit(1)
             }
             .padding()
-            .frame(width: 150)
+            .frame(width: 150) // Breite der DropDowns
             .background(Color(.systemGray6))
             .cornerRadius(8)
         }

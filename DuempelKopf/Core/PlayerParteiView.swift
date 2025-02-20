@@ -59,7 +59,7 @@ struct PlayerParteiView: View {
             .cornerRadius(24)
             .overlay(
                 RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color.black, lineWidth: 1)
+                    .stroke(Color.primary, lineWidth: 1)
             )
             .accentColor(partei == .re ? .white : .black)
         }

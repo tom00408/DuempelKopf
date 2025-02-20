@@ -14,15 +14,36 @@ struct SpielHinzufuegenView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
     
-    @State private var selectedReOption : String = ""
+    private var isSpielValid: Bool {
+        let playingTeams = teams.values.filter { $0 != .notPlaying }
+        
+        let reCount = playingTeams.filter { $0 == .re }.count
+        let kontraCount = playingTeams.filter { $0 == .kontra }.count
+        
+        return playingTeams.count == 4 &&
+               (reCount == 1 || reCount == 2) &&
+               (kontraCount == 2 || kontraCount == 3)
+    }
+
     
-    let reOptions = ["Re", "keine 90", "keine 60", "keine 30", "Schwarz"]
+    @State private var selectedReOption : String = "-"
+    @State private var selectedKontraOption : String = "-"
+    
+    @State private var reSonderpunkte : [String] = []
+    @State private var kontraSonderpunkte : [String] = []
+    
+    let reOptions = ["-","Re", "keine 90", "keine 60", "keine 30", "Schwarz"]
+    let kontraOptions = ["-","Kontra", "keine 90", "keine 60", "keine 30", "Schwarz"]
     
     @State var teams: [String: Partei] = [:]
+    
+    @State private var reAugen: Int? = nil
+    @State private var kontraAugen: Int? = nil
     
     var body: some View {
         NavigationView {
             VStack {
+                Line()
                 VStack {
                     ForEach(Array(teams.keys).chunked(into: 3), id: \.self) { row in
                         HStack {
@@ -35,41 +56,79 @@ struct SpielHinzufuegenView: View {
                     }
                 }
                 .padding()
-
+                
+                Line()
                 /*
                  Ansagen
                  */
-                HStack{
+                HStack {
                     /*
                      Re Überschrift
                      */
-                    HStack{
+                    HStack {
                         Text("Re-Partei")
                         Image(systemName: "suit.club")
-                    }.padding()
-                    .background(){
-                        Color.green
-                            .cornerRadius(24)
                     }
+                    .frame(maxWidth: .infinity) // Nimmt die gesamte verfügbare Breite
+                    .padding()
+                    .background(Color(hex: "#1A1A1D")) // Schwarz für Re
+                    .foregroundColor(.white) // Kontrastfarbe für bessere Lesbarkeit
+                    
                     /*
                      Kontra Überschrift
                      */
-                    HStack{
+                    HStack {
                         Text("Kontra-Partei")
                         Image(systemName: "suit.diamond")
-                        
-                    }.padding()
-                        .background(){
-                            Color.purple
-                                
-                                .cornerRadius(24)
-                        }
+                    }
+                    .frame(maxWidth: .infinity) // Nimmt die gesamte verfügbare Breite
+                    .padding()
+                    .background(Color(hex: "#D72638")) // Rot für Kontra
+                    .foregroundColor(.white) // Kontrastfarbe
+                }
+                .frame(maxWidth: .infinity) // Stellt sicher, dass der gesamte HStack breit bleibt
+
+                
+                HStack{
+                    Spacer()
+                    SingleSelectDropdown(
+                        title: "",
+                        options: reOptions,
+                        selectedOption: $selectedReOption
+                    )
+                    Text("Ansagen")
+                        .font(.system(size: 16,weight: .bold, design: .serif))
+                    SingleSelectDropdown(
+                        title: "",
+                        options: kontraOptions,
+                        selectedOption: $selectedKontraOption
+                    )
+                    Spacer()
                     
                 }
                 
                 HStack{
-                   
+                    Spacer()
+                    SingleNumberInput(
+                        title: "Re",
+                        value: $reAugen,
+                        linkedValue: $kontraAugen,
+                        total: 240
+                    )
+                    Text("  Augen  ")
+                        .font(.system(size: 16,weight: .bold, design: .serif))
                     
+                    SingleNumberInput(
+                        title: "Kontra",
+                        value: $kontraAugen,
+                        linkedValue: $reAugen,
+                        total: 240
+                    )
+                    Spacer()
+                }
+                HStack(alignment: .top){
+                    MultiSelectionListView(selectedItems: $reSonderpunkte)
+                    MultiSelectionListView(selectedItems: $kontraSonderpunkte)
                 }
     
                 
@@ -89,7 +148,7 @@ struct SpielHinzufuegenView: View {
                         print(teams)
                         updateListe()
                         dismiss()
-                    }
+                    }.disabled(!isSpielValid)
                 }
             }
             .onAppear {
