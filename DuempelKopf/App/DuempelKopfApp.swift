@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
+
 
 @main
 struct DuempelKopfApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ListView()
         }
+        .modelContainer(for: List.self)
     }
+    
+    
 }
