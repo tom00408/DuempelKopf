@@ -18,11 +18,11 @@ struct ListView: View {
     var body: some View {
         NavigationStack {
             ScrollView{
-                NavigationLink{
+                /*NavigationLink{
                     SingleListView(list: List.sample)
                 }label: {
                     ListRowView(list: List.sample)
-                }
+                }*/
                 ForEach(lists) { list in
                     NavigationLink{
                         SingleListView(list: list)

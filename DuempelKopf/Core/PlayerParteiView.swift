@@ -20,7 +20,10 @@ struct PlayerParteiView: View {
             return nil
         case .kontra:
             return "suit.diamond"
+        case .beideVerlieren:
+            return nil
         }
+        
     }
     
     private var color: Color {
@@ -31,6 +34,8 @@ struct PlayerParteiView: View {
             return .gray
         case .kontra:
             return Color(hex: "#D72638")
+        case .beideVerlieren:
+            return .purple
         }
     }
     
@@ -45,6 +50,8 @@ struct PlayerParteiView: View {
                     partei = .notPlaying
                 case .notPlaying:
                     partei = .re
+            case .beideVerlieren:
+                partei = .re
             }
         }label:{
             HStack {

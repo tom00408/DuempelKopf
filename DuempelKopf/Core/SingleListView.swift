@@ -18,13 +18,15 @@ struct SingleListView: View {
     init(list: List) {
         _viewModel = StateObject(wrappedValue: SingleListViewModel(list: list))
     }
-    let slimSize : CGFloat = 16
-    let notSlimSize : CGFloat = 32
+    private var fontSize : CGFloat {
+        slim ? inEuros ? 10 :16: 32
+    }
+    
     
     @State private var screenWidth: CGFloat = UIScreen.main.bounds.width
     
     var slim: Bool {
-        screenWidth < 400
+        screenWidth < 450
     }
     
     
@@ -38,178 +40,241 @@ struct SingleListView: View {
         }
     }
     
+    
     var body: some View {
-        VStack {
-            
-            
-            Text(viewModel.list.name)
-                .font(.system(size: 48, weight: .bold, design: .serif))
-            
-            HStack {
-                if let e = viewModel.list.einsatz {
-                    if e >= 1 {
-                        ListenFeatureView("\(e)€ pro Punkt")
-                    }else{
-                        ListenFeatureView("\(e*100)ct pro Punkt")
-                    }
-                }
-                if viewModel.list.maxDoppelBock {
-                    ListenFeatureView("Max DoppelBock")
-                }
-                if viewModel.list.nurMinus {
-                    ListenFeatureView("Nur Minus")
-                }
-            }
-            
-            Text(viewModel.list.info)
-                .font(.system(size: 24, weight: .light, design: .serif))
-            
-            /*
-             TABELLE / STANDINGS
-             */
-            if table {
-                ScrollView{
-                    HStack(alignment: .top){
-                        ForEach(viewModel.list.block.keys.sorted(), id: \.self){ key in
-                            if key != "Böcke" && key != "Punkte" {
-                                VLine(länge)
+        GeometryReader{ geometry in
+            let isLandscape = geometry.size.width > geometry.size.height
+            HStack{
+                VStack {
+                    /*
+                     TABELLE / STANDINGS
+                     */
+                    if table {
+                        SingleListHeader(viewModel.list)
+                        ScrollView{
+                            HStack(alignment: .top){
+                                ForEach(viewModel.list.block.keys.sorted(), id: \.self){ key in
+                                    if key != "Böcke" && key != "Punkte" {
+                                        VLine(länge)
+                                        Spacer()
+                                        VStack{
+                                            Text(key.prefix(slim ? 4: 10))
+                                                .fontWeight(.bold)
+                                            if let werte = viewModel.list.block[key]{
+                                                ForEach(werte, id: \.self){ wert in
+                                                    if inEuros, let e = viewModel.list.einsatz{
+                                                        Text("\(String(format: "%.2f €", Double(wert) * e))")
+                                                            .font(.system(size : fontSize))
+                                                    }
+                                                    else
+                                                    {
+                                                        Text("\(wert)")
+                                                            .font(.system(size: fontSize))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        Spacer()
+                                        
+                                    }
+                                }
+                                
+                                VLine(länge,2)
                                 Spacer()
+                                //Punkte
                                 VStack{
-                                    Text(key)
+                                    Text("P")
                                         .fontWeight(.bold)
-                                    if let werte = viewModel.list.block[key]{
+                                    if let werte = viewModel.list.block["Punkte"]{
                                         ForEach(werte, id: \.self){ wert in
                                             if inEuros, let e = viewModel.list.einsatz{
                                                 Text("\(String(format: "%.2f €", Double(wert) * e))")
-                                                    .font(.system(size : slim ? slimSize : notSlimSize))
+                                                    .font(.system(size: fontSize))
                                             }
                                             else
                                             {
                                                 Text("\(wert)")
-                                                    .font(.system(size: slim ? slimSize : notSlimSize))
+                                                    .font(.system(size: fontSize))
                                             }
+                                            
                                         }
                                     }
                                 }
                                 Spacer()
+                                VLine(länge)
+                                // BÖcke
+                                VStack{
+                                    Text("  ")
+                                    if let werte = viewModel.list.block["Böcke"]{
+                                        ForEach(werte, id: \.self){ wert in
+                                            Text(wert == 0 ? " " : wert == 1 ? "🐐" : wert == 2 ? "🐐🐐" : "\(wert)🐐")
+                                                .font(.system(size: fontSize))
+                                        }
+                                    }
+                                }
                                 
                             }
-                        }
-                        
-                        VLine(länge,2)
-                        Spacer()
-                        //Punkte
-                        VStack{
-                            Text("P")
-                                .fontWeight(.bold)
-                            if let werte = viewModel.list.block["Punkte"]{
-                                ForEach(werte, id: \.self){ wert in
-                                    if inEuros, let e = viewModel.list.einsatz{
-                                        Text("\(String(format: "%.2f €", Double(wert) * e))")
-                                            .font(.system(size: slim ? slimSize :notSlimSize))
-                                    }
-                                    else
-                                    {
-                                        Text("\(wert)")
-                                            .font(.system(size: slim ? slimSize :notSlimSize))
-                                    }
-                                    
-                                }
-                            }
-                        }
-                        Spacer()
-                        VLine(länge)
-                        // BÖcke
-                        VStack{
-                            Text("  ")
-                            if let werte = viewModel.list.block["Böcke"]{
-                                ForEach(werte, id: \.self){ wert in
-                                    Text(wert == 0 ? " " : wert == 1 ? "🐐" : wert == 2 ? "🐐🐐" : "\(wert)🐐")
-                                    //.font(.system(size: 14))
-                                }
-                            }
-                        }
-                        
-                    }
-                    Spacer()
-                    
-                }.padding()
-            }else{
-                ScrollView{
-                    Chart {
-                        ForEach(viewModel.list.block.keys.sorted(), id: \.self) { key in
-                            if key != "Böcke" && key != "Punkte" ,let liste = viewModel.list.block[key] {
-                                ForEach(Array(liste.enumerated()), id: \.offset) { index, wert in
-                                    LineMark(
-                                        x: .value("Runde", index + 1),
-                                        y: .value("Punkte", wert)
+                            Spacer()
+                            
+                        }.padding()
+                            .background{
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(style: StrokeStyle(lineWidth: 1)
                                     )
+                                .padding(8)}
+                    }else{
+                        ScrollView{
+                            SingleListHeader(viewModel.list)
+                            Chart {
+                                ForEach(viewModel.list.block.keys.sorted(), id: \.self) { key in
+                                    if key != "Böcke" && key != "Punkte" ,let liste = viewModel.list.block[key] {
+                                        ForEach(Array(liste.enumerated()), id: \.offset) { index, wert in
+                                            LineMark(
+                                                x: .value("Runde", index + 1),
+                                                y: .value("Punkte", wert)
+                                            )
+                                        }
+                                        .foregroundStyle(by: .value("Spieler", key))
+                                    }
                                 }
-                                .foregroundStyle(by: .value("Spieler", key))
                             }
+                            .chartXScale(
+                                domain: 1...(viewModel.list.block["Punkte"]?.count ?? 5)
+                            )
+                            .padding()
+                            .aspectRatio(1, contentMode: .fit)
                         }
                     }
-                    .chartXScale(
-                        domain: 1...(viewModel.list.block["Punkte"]?.count ?? 5)
-                    )
-                    .padding()
-                    .aspectRatio(1, contentMode: .fit)
-                }
-            }
-            
-            
-            
-            
-            
-            //ICONS
-            HStack{
-                
-                Button{
-                    inEuros.toggle()
-                }label: {
-                    Image(systemName: inEuros ? "p.circle.fill" : "eurosign.ring.dashed")
-                        .font(.system(size: 40))
-                        .accentColor(.blue)
-                }
-                Button{
-                    table.toggle()
-                }label: {
-                    Image(systemName: table ? "chart.line.uptrend.xyaxis" : "tablecells")
-                        .font(.system(size: 40))
-                        .accentColor(.green)
-                }
-                
-                
-                Button {
-                    showDeleteAlert = true
-                } label: {
-                    Image(systemName: "trash.circle")
-                        .font(.system(size: 50))
-                        .accentColor(.red)
-                }
-                .padding(.horizontal)
-                .alert("Liste löschen", isPresented: $showDeleteAlert) {
-                    Button("Abbrechen", role: .cancel) {}
-                    Button("Löschen", role: .destructive) {
-                        viewModel.deleteList(context: context, dismiss: dismiss)
+                    
+                    
+                    
+                    
+                    if !isLandscape{
+                        //ICONS
+                        HStack{
+                            Spacer()
+                            Button{
+                                inEuros.toggle()
+                                print("\(isLandscape)")
+                            }label: {
+                                Image(systemName: inEuros ? "p.circle.fill" : "eurosign.ring.dashed")
+                                    .font(.system(size: 40))
+                                    .accentColor(.blue)
+                            }.disabled(viewModel.list.einsatz == nil)
+                            .opacity(viewModel.list.einsatz == nil ? 0.5 : 1)
+                            
+                            
+                            Spacer()
+                            Button{
+                                table.toggle()
+                            }label: {
+                                Image(systemName: table ? "chart.line.uptrend.xyaxis" : "tablecells")
+                                    .font(.system(size: 40))
+                                    .accentColor(.yellow)
+                            }.disabled((viewModel.list.block["Punkte"]?.count ?? 0) < 2)
+                                .opacity((viewModel.list.block["Punkte"]?.count ?? 0) < 2 ? 0.5 : 1)
+                            
+                            Spacer()
+                            
+                            
+                            Button {
+                                showDeleteAlert = true
+                            } label: {
+                                Image(systemName: "trash.circle")
+                                    .font(.system(size: 50))
+                                    .accentColor(.red)
+                            }
+                            .padding(.horizontal)
+                            .alert("Liste löschen", isPresented: $showDeleteAlert) {
+                                Button("Abbrechen", role: .cancel) {}
+                                Button("Löschen", role: .destructive) {
+                                    viewModel.deleteList(context: context, dismiss: dismiss)
+                                }
+                            } message: {
+                                Text("Bist du sicher, dass du diese Liste löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")
+                            }
+                            Spacer()
+                        }
+                        .padding()
+                        .background{
+                            Color(.systemGray3)
+                                .cornerRadius(24)
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(style: StrokeStyle(lineWidth: 3)
+                                )}
                     }
-                } message: {
-                    Text("Bist du sicher, dass du diese Liste löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")
+                    
+                }//VStack
+                
+                if isLandscape{
+                    //ICONS
+                    VStack{
+                        
+                        Button{
+                            inEuros.toggle()
+                            print("\(isLandscape)")
+                        }label: {
+                            Image(systemName: inEuros ? "p.circle.fill" : "eurosign.ring.dashed")
+                                .font(.system(size: 35))
+                                .accentColor(.blue)
+                        }.disabled(viewModel.list.einsatz == nil)
+                        .opacity(viewModel.list.einsatz == nil ? 0.5 : 1)
+                        .padding(.bottom,48)
+                        
+                        
+                        
+                        Button{
+                            table.toggle()
+                        }label: {
+                            Image(systemName: table ? "chart.line.uptrend.xyaxis" : "tablecells")
+                                .font(.system(size: 35))
+                                .accentColor(.yellow)
+                        }.disabled((viewModel.list.block["Punkte"]?.count ?? 0) < 2)
+                            .opacity((viewModel.list.block["Punkte"]?.count ?? 0) < 2 ? 0.5 : 1)
+                            .padding(.bottom,48)
+                        
+                        
+                        
+                        Button {
+                            showDeleteAlert = true
+                        } label: {
+                            Image(systemName: "trash.circle")
+                                .font(.system(size: 35))
+                                .accentColor(.red)
+                        }
+                        .padding(.horizontal)
+                        .alert("Liste löschen", isPresented: $showDeleteAlert) {
+                            Button("Abbrechen", role: .cancel) {}
+                            Button("Löschen", role: .destructive) {
+                                viewModel.deleteList(context: context, dismiss: dismiss)
+                            }
+                        } message: {
+                            Text("Bist du sicher, dass du diese Liste löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")
+                        }
+                        
+                    }
+                    .padding(4)
+                    .background{
+                        Color(.systemGray3)
+                            .cornerRadius(24)
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(style: StrokeStyle(lineWidth: 3)
+                            )}
+                }
+                
+            }
+            .background(Color(.systemGray4))
+            .toolbar{
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Spiel Hinzufügen"){
+                        showSpielHinzufügen.toggle()
+                    }
                 }
             }
-            
-        }
-        .background(Color(.systemGray4))
-        .toolbar{
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Spiel Hinzufügen"){
-                    showSpielHinzufügen.toggle()
-                }
+            .sheet(isPresented: $showSpielHinzufügen) {
+                SpielHinzufuegenView(viewModel: viewModel)
+                
             }
-        }
-        .sheet(isPresented: $showSpielHinzufügen) {
-            SpielHinzufuegenView(viewModel: viewModel)
-            
         }
     }
 }

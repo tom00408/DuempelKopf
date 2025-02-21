@@ -8,7 +8,7 @@
 import Foundation
 // Enum für Partei
 enum Partei: String, Codable, CaseIterable, Identifiable {
-    case re, kontra, notPlaying
+    case re, kontra, notPlaying, beideVerlieren
     
     var id: Self { self }
     
@@ -17,6 +17,7 @@ enum Partei: String, Codable, CaseIterable, Identifiable {
         case .re: "Re"
         case .kontra: "Kontra"
         case .notPlaying: "---"
+        case .beideVerlieren: "Beide verlieren"
         }
     }
 }

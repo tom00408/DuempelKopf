@@ -36,6 +36,9 @@ extension SingleListViewModel{
         var re = false
         var kontra = false
         
+        var reDrüber = false
+        var kontraDrüber = false
+        
         /*
          Ansagen für Re
          */
@@ -54,6 +57,7 @@ extension SingleListViewModel{
                     gewinner = .re
                 }else{
                     punkteKontra += 2
+                    reDrüber = true
                     gewinner = .kontra
                 }
             case "keine 60":
@@ -62,6 +66,7 @@ extension SingleListViewModel{
                     gewinner = .re
                 }else{
                     punkteKontra += 2
+                    reDrüber = true
                     if spiel.kontraAugen >= 90{
                         punkteKontra += 2
                         
@@ -74,6 +79,7 @@ extension SingleListViewModel{
                     gewinner = .re
                 }else{
                     punkteKontra += 2
+                    reDrüber = true
                     if spiel.kontraAugen >= 60{
                         punkteKontra += 2
                     }
@@ -88,7 +94,7 @@ extension SingleListViewModel{
                     gewinner = .re
                 }else{
                     punkteKontra += 2
-                    
+                    reDrüber = true
                     if spiel.kontraAugen >= 30{
                         punkteKontra += 2
                     }
@@ -129,6 +135,7 @@ extension SingleListViewModel{
                     punkteKontra += 1
                     gewinner = .kontra
                 } else {
+                    kontraDrüber = true
                     punkteRe += 2
                     gewinner = .re
                 }
@@ -137,8 +144,10 @@ extension SingleListViewModel{
                 if spiel.reAugen < 60 {
                     punkteKontra += 2
                     gewinner = .kontra
+                    
                 } else {
                     punkteRe += 2
+                    kontraDrüber = true
                     if spiel.reAugen >= 90 {
                         punkteRe += 2
                     }
@@ -150,6 +159,7 @@ extension SingleListViewModel{
                     punkteKontra += 3
                     gewinner = .kontra
                 } else {
+                    kontraDrüber = true
                     punkteRe += 2
                     if spiel.reAugen >= 60 {
                         punkteRe += 2
@@ -165,6 +175,7 @@ extension SingleListViewModel{
                     punkteKontra += 4
                     gewinner = .kontra
                 } else {
+                    kontraDrüber = true
                     punkteRe += 2
                     
                     if spiel.reAugen >= 30 {
@@ -220,6 +231,8 @@ extension SingleListViewModel{
             punkteKontra += 1
         }
         
+        
+        
         //RE
         if re {
             punkteKontra *= 2
@@ -228,6 +241,12 @@ extension SingleListViewModel{
         if kontra {
             punkteRe *= 2
             punkteKontra *= 2
+        }
+        
+        if reDrüber && kontraDrüber {
+            gewinner = .beideVerlieren
+            punkteRe = 15
+            punkteKontra = 15
         }
         
         // Sonderpunkte aus der Liste hinzufügen
@@ -242,11 +261,10 @@ extension SingleListViewModel{
         //BÖCKE X
         if let bockList = list.block["Böcke"],
            let punkteList = list.block["Punkte"]
-           {
+        {
             
-            let bock = bockList[punkteList.count] // Sicherer Zugriff auf den Bock-Wert
-            
-            punkte *= Int(pow(2.0, Double(bock))) // pow() gibt Double zurück → Umwandlung in Int
+            let bock = bockList[safe: punkteList.count]
+            punkte *= Int(pow(2.0, Double(bock ?? 0))) // pow() gibt Double zurück → Umwandlung in Int
             print("punkte x2")
         }else{
             print("nicht geladen")
@@ -257,12 +275,12 @@ extension SingleListViewModel{
         for (key, partei) in spiel.teams {
             // Hole den letzten Punktestand des Spielers oder setze ihn auf 0
             let letzterPunktestand = list.block[key]?.last ?? 0
-
+            
             // Falls der Spieler noch keine Einträge hat, initialisiere die Liste
             if list.block[key] == nil {
                 list.block[key] = []
             }
-
+            
             if partei == .re {
                 let reCount = spiel.teams.values.filter { $0 == .re }.count
                 if gewinner == .re {
@@ -288,23 +306,23 @@ extension SingleListViewModel{
                 list.block[key]?.append(letzterPunktestand)
             }
         }
-
+        
         list.block["Punkte"]?.append(punkte)
         
         
         
         //Böcke
-         if(
+        if(
             (re && kontra) ||
             (kontra && gewinner == .re) ||
             (punkte == 0) ||
             (spiel.kontraAugen == 120) ||
             (spiel.reSonderpunkte.contains("Herzdurchlauf")) ||
             (spiel.kontraSonderpunkte.contains("Herzdurchlauf"))
-                
-         ){
-             böcke()
-         }
+            
+        ){
+            böcke()
+        }
         
         
         
@@ -316,19 +334,23 @@ extension SingleListViewModel{
         let p = list.players.count
         var runde = list.block["Punkte"]?.count ?? 0
         var i = 0
-
         
-
+        // Falls "Böcke" noch nicht existiert, initialisiere es als leeres Array
+        if list.block["Böcke"] == nil {
+            list.block["Böcke"] = []
+        }
+        
         while i < p {
             // Sicherstellen, dass "Böcke" mindestens bis "runde + i" gefüllt ist
-            
-
-            if list.block["Böcke"] == nil {
-                list.block["Böcke"] = []
+            if list.block["Böcke"]!.count <= runde + i {
+                list.block["Böcke"]!.append(1) // Initialisieren mit 1
+                print("!BOCK")
+                i += 1
+                continue
             }
             
-            // Bock-Wert holen
-            if let b = list.block["Böcke"]?[runde + i] {
+            // Bock-Wert holen (sicher)
+            if let b = list.block["Böcke"]![safe: runde + i] {
                 if list.maxDoppelBock {
                     if b < 2 {
                         list.block["Böcke"]?[runde + i] = b + 1
@@ -338,20 +360,24 @@ extension SingleListViewModel{
                         runde += 1
                     }
                 } else {
-                    // Falls maxDoppelBock deaktiviert ist, erhöhe einfach i
                     list.block["Böcke"]?[runde + i] = b + 1
                     i += 1
                 }
             } else {
-                // Falls der Index nicht existiert, setze ihn auf 1
-                list.block["Böcke"]?[runde + i] = 1
+                list.block["Böcke"]![runde + i] = 1
                 print("!BOCK")
                 i += 1
             }
         }
+        
+        
+        
     }
-
-    
-    
 }
 
+extension Dictionary where Value: MutableCollection, Value.Index == Int {
+    subscript(safe index: Key) -> Value? {
+        get { return self[index] }
+        set { if self[index] != nil { self[index] = newValue } }
+    }
+}
