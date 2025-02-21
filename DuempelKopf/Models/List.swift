@@ -28,7 +28,7 @@ class List: Identifiable{
         self.info = info
         self.players = []
         self.block = [
-            "Punkte" : [],
+            "Punkte" : [Int.random(in: 1...10), Int.random(in: -10...10)],
             "Böcke" :[mitBockStarten ? 1 :0]
         ]
         self.nurMinus = nurMinus
@@ -37,8 +37,10 @@ class List: Identifiable{
         
         for playerName in players{
             self.players.append(Player(playerName))
-            self.block[playerName] = []
+            self.block[playerName] = [Int.random(in: 1...10), Int.random(in: -10...10)]
         }
+        
+        
         
         
     }
@@ -50,7 +52,6 @@ class List: Identifiable{
         info: "Die erste Testliste",
         mitBockStarten: true,
         einsatz: 0.2
-        
     )
     
 }
