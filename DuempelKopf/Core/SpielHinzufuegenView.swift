@@ -55,7 +55,7 @@ struct SpielHinzufuegenView: View {
             ScrollView {
                 
                 VStack {
-                    ForEach(Array(teams.keys).chunked(into: 3), id: \.self) { row in
+                    ForEach(Array(teams.keys).chunked(into: UIDevice.current.orientation.isLandscape ? 6 : 3), id: \.self) { row in
                         HStack {
                             ForEach(row, id: \.self) { key in
                                 if let binding = bindingForKey(key) { // Sichere Binding-Referenz
@@ -79,10 +79,11 @@ struct SpielHinzufuegenView: View {
                         Text("Re-Partei")
                         Image(systemName: "suit.club")
                     }
-                    .frame(maxWidth: .infinity) // Nimmt die gesamte verfügbare Breite
+                    .frame(width: 175) // Nimmt die gesamte verfügbare Breite
                     .padding()
                     .background(Color(hex: "#1A1A1D")) // Schwarz für Re
-                    .foregroundColor(.white) // Kontrastfarbe für bessere Lesbarkeit
+                    .foregroundColor(.white)
+                    .cornerRadius(8)// Kontrastfarbe für bessere Lesbarkeit
                     
                     /*
                      Kontra Überschrift
@@ -91,10 +92,11 @@ struct SpielHinzufuegenView: View {
                         Text("Kontra-Partei")
                         Image(systemName: "suit.diamond")
                     }
-                    .frame(maxWidth: .infinity) // Nimmt die gesamte verfügbare Breite
+                    .frame(width: 175) // Nimmt die gesamte verfügbare Breite
                     .padding()
                     .background(Color(hex: "#D72638")) // Rot für Kontra
                     .foregroundColor(.white) // Kontrastfarbe
+                    .cornerRadius(8)
                 }
                 .frame(maxWidth: .infinity) // Stellt sicher, dass der gesamte HStack breit bleibt
 

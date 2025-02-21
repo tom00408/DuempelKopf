@@ -18,27 +18,10 @@ struct ListView: View {
     var body: some View {
         NavigationStack {
             ScrollView{
-                if lists.isEmpty {
-                    Button {
-                        // Aktion hier einfügen
-                        showForm.toggle()
-                    }
-                    label: {
-                        HStack {
-                            Spacer()
-                            Text("Erstelle deine erste Liste")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            Image(systemName: "document.badge.plus.fill")
-                                .foregroundColor(.white)
-                            Spacer()
-                        }
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(10)
-                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
-                    }
-                    .padding(.horizontal)
+                NavigationLink{
+                    SingleListView(list: List.sample)
+                }label: {
+                    ListRowView(list: List.sample)
                 }
                 ForEach(lists) { list in
                     NavigationLink{
@@ -47,15 +30,37 @@ struct ListView: View {
                         ListRowView(list: list)
                     }
                 }
+                Button {
+                    // Aktion hier einfügen
+                    showForm.toggle()
+                }
+                label: {
+                    HStack {
+                        Spacer()
+                        Text("Erstelle deine erste Liste")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Image(systemName: "document.badge.plus.fill")
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(10)
+                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
+                }
+                .padding(.horizontal)
                 
             }
+            .background(Color(.systemGray4))
             .navigationTitle("Listen")
             .toolbar {
-                Button {
-                    showForm.toggle()
+                NavigationLink {
+                    InfoView()
+                        .background(Color(.systemGray4))
                 } label: {
-                    Image(systemName: "plus.circle")
-                        .font(.title)
+                    Image(systemName: "info.bubble.fill")
+                        .foregroundColor(.white)
                 }
             }
             .sheet(isPresented: $showForm) {
