@@ -52,6 +52,7 @@ class List: Identifiable{
         name: "TestListe",
         players: Player.allNames,
         info: "Die erste Testliste",
+        nurMinus: false,
         mitBockStarten: true,
         einsatz: 0.2
     )

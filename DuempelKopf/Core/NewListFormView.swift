@@ -17,7 +17,7 @@ struct NewListFormView: View {
     
     
     @State private var OGs: [String] = ["Emil", "Erik", "Nils", "Tom", "Freddy"]
-    
+    @State private var BPs: [String] = ["Robin","Joshi","Emil","Tom"]
     private var isFormValid: Bool {
         name.count > 2 &&
         playerNames.count >= 4
@@ -105,6 +105,26 @@ struct NewListFormView: View {
                         }
                     }
                 }
+                if !BPs.isEmpty{
+                    Section(header: Text("BP")) {
+                        ForEach(BPs, id: \.self){ bp in
+                            HStack {
+                                Text(bp)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                Spacer()
+                                Button(action: {
+                                    playerNames.append(bp)
+                                    BPs.removeAll { $0 == bp }
+                                }) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 
                 Section{
                     Button {

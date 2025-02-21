@@ -280,16 +280,18 @@ extension SingleListViewModel{
             if list.block[key] == nil {
                 list.block[key] = []
             }
+            print("\(punkte)")
             
             if partei == .re {
                 let reCount = spiel.teams.values.filter { $0 == .re }.count
                 if gewinner == .re {
                     // Gewinner bekommt Punkte
-                    list.block[key]?.append(!list.nurMinus ? letzterPunktestand + (punkte * reCount == 3 ? 3 : 1) : letzterPunktestand)
+                    print(reCount == 1 ? "3" : "1")
+                    list.block[key]?.append(!list.nurMinus ? letzterPunktestand + (punkte * (reCount == 1 ? 3 : 1)) : letzterPunktestand)
                 } else {
                     // Verlierer bekommt entweder -punkte oder bleibt bei nurMinus unverändert
                     var modifiziertePunkte = list.nurMinus ? punkte : -punkte
-                    modifiziertePunkte *= reCount == 1 ? 3 : 1
+                    modifiziertePunkte *= (reCount == 1 ? 3 : 1)
                     list.block[key]?.append(letzterPunktestand + modifiziertePunkte)
                 }
             } else if partei == .kontra {
@@ -344,7 +346,7 @@ extension SingleListViewModel{
             // Sicherstellen, dass "Böcke" mindestens bis "runde + i" gefüllt ist
             if list.block["Böcke"]!.count <= runde + i {
                 list.block["Böcke"]!.append(1) // Initialisieren mit 1
-                print("!BOCK")
+                //print("!BOCK")
                 i += 1
                 continue
             }
@@ -354,7 +356,7 @@ extension SingleListViewModel{
                 if list.maxDoppelBock {
                     if b < 2 {
                         list.block["Böcke"]?[runde + i] = b + 1
-                        print("BOCK")
+                        //print("BOCK")
                         i += 1
                     } else {
                         runde += 1
@@ -365,7 +367,7 @@ extension SingleListViewModel{
                 }
             } else {
                 list.block["Böcke"]![runde + i] = 1
-                print("!BOCK")
+                //print("!BOCK")
                 i += 1
             }
         }
