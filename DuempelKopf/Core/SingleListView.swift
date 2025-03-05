@@ -10,6 +10,8 @@ struct SingleListView: View {
     @Environment(\.modelContext) private var context
     
     @State private var showDeleteAlert = false
+    @State private var showPottAlert = false
+    @State private var showBöckeAlert = false
     @State private var showSpielHinzufügen = false
     
     @State private var inEuros : Bool = false
@@ -147,7 +149,9 @@ struct SingleListView: View {
                     }
                     
                     
-                    
+                    /*
+                     1x Icons
+                     */
                     
                     if !isLandscape{
                         //ICONS
@@ -161,7 +165,7 @@ struct SingleListView: View {
                                     .font(.system(size: 40))
                                     .accentColor(.blue)
                             }.disabled(viewModel.list.einsatz == nil)
-                            .opacity(viewModel.list.einsatz == nil ? 0.5 : 1)
+                                .opacity(viewModel.list.einsatz == nil ? 0.5 : 1)
                             
                             
                             Spacer()
@@ -194,6 +198,46 @@ struct SingleListView: View {
                                 Text("Bist du sicher, dass du diese Liste löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")
                             }
                             Spacer()
+                            
+                            
+                            
+                            Button{
+                                showPottAlert = true
+                            }label: {
+                                Text("💰")
+                                    .font(.system(size: 50))
+                                    .cornerRadius(24)
+                            }.padding(.horizontal)
+                                .alert(
+                                    "Gesamter Pott",
+                                    isPresented: $showPottAlert){
+                                    Button("Okay", role: .cancel) {
+                                        print("okay")
+                                    }
+                                    } message:{
+                                        Text("Der gesamte Pott beträgt: \(viewModel.getPott())")
+                                    }
+                            
+                            
+                            Button {
+                                showBöckeAlert = true
+                            } label: {
+                                Text("🐐")
+                                    .font(.system(size: 50))
+                                    
+                            }
+                            .padding(.horizontal)
+                            .alert("Liste löschen", isPresented: $showBöckeAlert) {
+                                Button("Abbrechen", role: .cancel) {}
+                                Button("Ja") {
+                                    viewModel.böcke()
+                                }
+                            } message: {
+                                Text("Du willst \(viewModel.list.players.count) Böcke hinzufügen.")
+                            }
+                            Spacer()
+
+                            
                         }
                         .padding()
                         .background{
@@ -202,10 +246,17 @@ struct SingleListView: View {
                             RoundedRectangle(cornerRadius: 24)
                                 .stroke(style: StrokeStyle(lineWidth: 3)
                                 )}
+                        Spacer()
+                        
+                                                
                     }
                     
                 }//VStack
                 
+                
+                /*
+                 2x Icons
+                 */
                 if isLandscape{
                     //ICONS
                     VStack{
@@ -218,8 +269,8 @@ struct SingleListView: View {
                                 .font(.system(size: 35))
                                 .accentColor(.blue)
                         }.disabled(viewModel.list.einsatz == nil)
-                        .opacity(viewModel.list.einsatz == nil ? 0.5 : 1)
-                        .padding(.bottom,48)
+                            .opacity(viewModel.list.einsatz == nil ? 0.5 : 1)
+                            .padding(.bottom,48)
                         
                         
                         
@@ -282,6 +333,6 @@ struct SingleListView: View {
 
 #Preview {
     NavigationStack{
-        SingleListView(list: List.sample)
+        SingleListView(list: List.preview)
     }
 }

@@ -18,6 +18,26 @@ class SingleListViewModel: ObservableObject {
         }
         dismiss()
     }
+    
+    func getPott() -> String{
+        let block = list.block
+        var pot = 0.0
+        for (key, values) in block {  // Iteriere durch Dictionary
+            if key != "Punkte" && key != "Böcke" {
+                if let lastValue = values.last {  // Hole das letzte Element des Arrays
+                    print(lastValue)
+                    pot += Double(lastValue)
+                }
+            }
+        }
+        if let einsatz = list.einsatz{
+            pot *= einsatz
+        }
+        //print(pot)
+        return String(format: "%.2f €",pot)
+        
+    }
+    
 }
 /*
  LOGIK DES SPIELS
