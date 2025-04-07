@@ -47,12 +47,23 @@ class List: Identifiable{
         }else{
             self.block = block!
         }
-        
-        
-        
-            
-        
-        
+    }//init
+    
+    func getPott() -> String{
+        var pot = 0.0
+        for (key, values) in block {  // Iteriere durch Dictionary
+            if key != "Punkte" && key != "Böcke" {
+                if let lastValue = values.last {  // Hole das letzte Element des Arrays
+                    print(lastValue)
+                    pot += Double(lastValue)
+                }
+            }
+        }
+        if let einsatz = einsatz{
+            pot *= einsatz
+        }
+        //print(pot)
+        return pot.asEuroString()
         
     }
     
@@ -68,11 +79,11 @@ class List: Identifiable{
     
     
     static var block = [
-        "Robin": [0, -4],
-        "Joshi": [0, -4],
-        "Magda": [-6, -6],
-        "Tom" : [-6, -6],
-        "Punkte" : [6,4],
+        "Robin": [0, 4,6],
+        "Joshi": [0, 4,4],
+        "Magda": [6, 6,8],
+        "Tom" : [6, 6,6],
+        "Punkte" : [6,4,2],
         "Böcke" : [0,0,1,1,1,1]
     ]
     
