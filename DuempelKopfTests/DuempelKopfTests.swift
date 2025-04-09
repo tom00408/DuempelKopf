@@ -16,5 +16,11 @@ struct DuempelKopfTests {
             #expect(viewModel.list.name == "BOCKTESTLISTE")
             #expect(viewModel.list.name == "BOCKTESTLISTE")
     }
+    
+    @Test func testeBocke2() throws {
+        let i = 10
+        #expect(i == 10)
+        #expect(i == 5)
+    }
 
 }
