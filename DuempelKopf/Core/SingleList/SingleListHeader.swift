@@ -16,6 +16,10 @@ struct SingleListHeader: View {
     var body: some View {
         Text(list.name)
             .font(.system(size: 48, weight: .bold, design: .serif))
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .truncationMode(.tail)
+        
         
         HStack {
             if let e = list.einsatz {
@@ -35,6 +39,9 @@ struct SingleListHeader: View {
         
         Text(list.info)
             .font(.system(size: 24, weight: .light, design: .serif))
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .truncationMode(.tail)
         
     }
 }

@@ -13,6 +13,7 @@ struct NewListFormView: View {
     @State private var nurMinus = true
     @State private var maxDoppelBock = true
     @State private var mitBockStarten = false
+    @State private var ansagenVerdoppeln = true
     @State private var einsatz = ""
     
     
@@ -47,7 +48,12 @@ struct NewListFormView: View {
                     }
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
                     
-                    TextField("Einsatz", text: $einsatz)
+                    Toggle(isOn: $ansagenVerdoppeln) {
+                        Text("Ansagen verdoppeln")
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
+                    
+                    TextField("Einsatz in €", text: $einsatz)
                     
                 }
 
@@ -183,6 +189,7 @@ struct NewListFormView: View {
             nurMinus: nurMinus,
             maxDoppelBock: maxDoppelBock,
             mitBockStarten: mitBockStarten,
+            ansagenVerdoppeln: ansagenVerdoppeln,
             einsatz: parseToDouble(einsatz)
         )
         //print(list.einsatz)

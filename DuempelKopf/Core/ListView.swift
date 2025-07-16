@@ -11,13 +11,16 @@ import SwiftData
 struct ListView: View {
     
     @Environment(\.modelContext) private var context
-    @Query private var lists: [List]
+    @Query private var lists: [List] 
     
     @State private var showForm = false
     
     var body: some View {
         NavigationStack {
             ScrollView{
+                /*
+                 Preview List
+                 */
                 NavigationLink{
                     SingleListView(list: List.preview)
                 }label: {

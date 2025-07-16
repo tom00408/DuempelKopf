@@ -19,9 +19,10 @@ class List: Identifiable{
     var block : [String : [Int]]
     var nurMinus : Bool
     var maxDoppelBock: Bool
+    var ansagenVerdoppeln : Bool
     var einsatz : Double?
     
-    init(name: String, players: [String], info: String, nurMinus: Bool = true, maxDoppelBock: Bool = true, mitBockStarten : Bool = false, einsatz: Double? = nil, block : [String : [Int]]? = nil) {
+    init(name: String, players: [String], info: String, nurMinus: Bool = true, maxDoppelBock: Bool = true, mitBockStarten : Bool = false, ansagenVerdoppeln : Bool = true, einsatz: Double? = nil, block : [String : [Int]]? = nil) {
         
         self.id = UUID().uuidString
         self.name = name
@@ -29,6 +30,7 @@ class List: Identifiable{
         self.players = []
         self.nurMinus = nurMinus
         self.maxDoppelBock = maxDoppelBock
+        self.ansagenVerdoppeln = ansagenVerdoppeln
         self.einsatz = einsatz
         
         if block == nil{
@@ -90,5 +92,10 @@ class List: Identifiable{
     static var preview = List(name: "Preview Liste", players: [], info: "Fürs Canva",
                               einsatz: 0.2,
                               block: block)
+    
+    
+    static var preview2 = List(name: "Preview Liste", players: [], info: "Fürs Canva",
+                               nurMinus: false,einsatz: 0.2,
+                               block: block)
     
 }

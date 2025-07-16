@@ -38,6 +38,21 @@ class SingleListViewModel: ObservableObject {
         
     }
     
+    func letztesSpielLöschen(dismiss : DismissAction) {
+        var spalten : [String] = []
+        
+        for player in list.players{
+            spalten.append(player.name)
+        }
+        
+        spalten.append("Punkte")
+        
+        for spalte in spalten{
+            list.block[spalte]?.removeLast()
+        }
+        dismiss()
+    }
+    
 }
 /*
  LOGIK DES SPIELS
@@ -255,12 +270,22 @@ extension SingleListViewModel{
         
         //RE
         if re {
-            punkteKontra *= 2
-            punkteRe *= 2
+            if list.ansagenVerdoppeln{
+                punkteKontra *= 2
+                punkteRe *= 2
+            }else{
+                punkteKontra += 2
+                punkteRe += 2
+            }
         }
         if kontra {
-            punkteRe *= 2
-            punkteKontra *= 2
+            if list.ansagenVerdoppeln{
+                punkteRe *= 2
+                punkteKontra *= 2
+            }else{
+                punkteRe += 2
+                punkteKontra += 2
+            }
         }
         
         if reDrüber && kontraDrüber {

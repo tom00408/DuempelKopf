@@ -65,7 +65,11 @@ struct SingleListView: View {
                 }
             }
             .sheet(isPresented: $showSpielHinzufügen) {
-                SpielHinzufuegenView(viewModel: viewModel)
+                SpielHinzufuegenView(
+                    viewModel: viewModel,
+                    context: context,
+                    dismiss: dismiss
+                )
                 
             }
         }

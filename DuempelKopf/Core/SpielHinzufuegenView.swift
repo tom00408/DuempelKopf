@@ -6,16 +6,23 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SpielHinzufuegenView: View {
     
     var list: List
     @ObservedObject var viewModel : SingleListViewModel
     
-    init(viewModel: SingleListViewModel){
+    var listContext: ModelContext
+    var listDismiss : DismissAction
+    
+    init(viewModel: SingleListViewModel, context: ModelContext, dismiss: DismissAction){
         
         self.viewModel = viewModel
         self.list = viewModel.list
+        
+        self.listContext = context
+        self.listDismiss = dismiss
     }
     
     @Environment(\.dismiss) var dismiss
@@ -151,6 +158,22 @@ struct SpielHinzufuegenView: View {
                     )
                 }
     
+                
+                Button{
+                    viewModel.deleteList(context: listContext, dismiss: listDismiss)
+                }label:
+                {
+                   Text("Liste löschen")
+                    
+                }
+                
+                Button{
+                    viewModel.letztesSpielLöschen(dismiss: dismiss)
+                }label:
+                {
+                   Text("Letztes Spiel löschen")
+                    
+                }
                 
                 
                 Spacer()
